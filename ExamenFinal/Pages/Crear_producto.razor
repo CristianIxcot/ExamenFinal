@@ -1,0 +1,110 @@
+﻿@page "/ingreso-producto"
+@inject HttpClient http
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<h3>Ingreso de Producto</h3>
+<EditForm Model="@laptop" OnValidSubmit="@Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+
+    <div class="form-group">
+        <label for="Vida">Numero de Serie del Dispositivo</label>
+        <InputNumber id="Vida" @bind-Value="laptop.NoSerie" class="form-control" />
+
+    </div>
+    <div class="form-group">
+        <label for="Nombre">Marca del producto</label>
+        <InputText id="Nombre" @bind-Value="laptop.Marca" class="form-control" />
+        <ValidationMessage For="() => laptop.Marca" />
+    </div>
+    <div class="form-group">
+        <label for="Vida">Modelo del Dispositivo</label>
+        <InputNumber id="Vida" @bind-Value="laptop.Modelo" class="form-control" />
+
+    </div>
+    <div class="form-group">
+        <label for="Vida">Memoria RAM del Dispositivo</label>
+        <InputNumber id="Vida" @bind-Value="laptop.MemoriaRam" class="form-control" />
+
+    </div>
+    <div class="form-group">
+        <label for="Vida">Almacenamiento del Dispositivo</label>
+        <InputNumber id="Vida" @bind-Value="laptop.Almacenamiento" class="form-control" />
+
+    </div>
+    
+    
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+
+
+</EditForm>
+@if (laptops != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>No Serie</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Memoria RAM</th>
+                <th>Almacenamiento</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var laptop in laptops)
+            {
+                <tr>
+                    <td>@laptop.NoSerie</td>
+                    <td>@laptop.Marca</td>
+                    <td>@laptop.Modelo</td>
+                    <td>@laptop.MemoriaRam</td>
+                    <td>@laptop.Almacenamiento</td>
+                    <td>
+                        <button class="btn btn-danger"
+                                @onclick="@(() => Borrar(laptop.Almacenamiento))">
+                            Eliminar
+                        </button>
+                    </td>
+                    <td>
+                        <button class="btn btn-warning"
+                                @onclick="@(() => NavigationManager.NavigateTo($"/producto-editar/{laptop.Almacenamiento}"))">
+                            Editar
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    private Laptop laptop = new Laptop();
+    List<Laptop> laptops = new List<Laptop>();
+
+    protected async Task Guardar()
+    {
+        laptops.Add(laptop);
+        laptop = new Laptop();
+        await localStorage.SetItemAsync("laptops", laptops);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {   //La primera vez que se corre poner en comentarios, pues como no existen datos
+        //convierta la lista catedraticos en null
+        laptops = await localStorage.GetItemAsync<List<Laptop>>("laptops");
+        if (laptops == null)
+        {
+            laptops = new List<Laptop>();
+        }
+    }
+    protected async Task Borrar(int Almacenamiento)
+    {   
+        laptops.Remove(laptops.First(c => c.Almacenamiento == Almacenamiento));
+        await localStorage.SetItemAsync("laptops", laptops);
+
+    }
+}

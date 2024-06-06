@@ -1,0 +1,68 @@
+﻿@page "/producto-editar/{almacenamiento}"
+@inject HttpClient http
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<h3>Editar producto</h3>
+
+<h3>Ingreso de Producto</h3>
+<EditForm Model="@laptop" OnValidSubmit="@Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+
+    <div class="form-group">
+        <label for="Vida">Numero de Serie del Dispositivo</label>
+        <InputNumber id="Vida" @bind-Value="laptop.NoSerie" class="form-control" />
+
+    </div>
+    <div class="form-group">
+        <label for="Nombre">Marca del producto</label>
+        <InputText id="Nombre" @bind-Value="laptop.Marca" class="form-control" />
+        <ValidationMessage For="() => laptop.Marca" />
+    </div>
+    <div class="form-group">
+        <label for="Vida">Modelo del Dispositivo</label>
+        <InputNumber id="Vida" @bind-Value="laptop.Modelo" class="form-control" />
+
+    </div>
+    <div class="form-group">
+        <label for="Vida">Memoria RAM del Dispositivo</label>
+        <InputNumber id="Vida" @bind-Value="laptop.MemoriaRam" class="form-control" />
+
+    </div>
+    <div class="form-group">
+        <label for="Vida">Almacenamiento del Dispositivo</label>
+        <InputNumber id="Vida" @bind-Value="laptop.Almacenamiento" class="form-control" />
+
+    </div>
+
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+
+
+</EditForm>
+@code {
+    [Parameter]
+    public int almacenamiento { get; set; }
+
+    private Laptop laptop = new Laptop();
+    List<Laptop> laptops = new List<Laptop>();
+
+    protected async Task Guardar()
+    {
+        await localStorage.SetItemAsync("laptops", laptops);
+        NavigationManager.NavigateTo("/ingreso-producto");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        laptops = await localStorage.GetItemAsync<List<Laptop>>("laptops");
+        laptop = laptops.Find(c => c.Almacenamiento == almacenamiento);
+        /*if (laptops == null)
+        {
+            laptops = new List<Laptop>();
+        }*/
+    }
+}
